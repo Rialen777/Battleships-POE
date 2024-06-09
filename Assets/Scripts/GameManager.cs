@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
         shipScript = ships[shipIndex].GetComponent<ShipScript>();
         nextBtn.onClick.AddListener(() => NextShipClicked());
         rotateBtn.onClick.AddListener(() => RotateClicked());
-        replayBtn.onClick.AddListener(() => ReplayClicked());
+        //replayBtn.onClick.AddListener(() => ReplayClicked());
         enemyShips = enemyScript.PlaceEnemyShips();
     }
 
