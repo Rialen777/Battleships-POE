@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
-using static System.Net.Mime.MediaTypeNames;
+
 
 
 public class GameManager : MonoBehaviour
@@ -24,9 +24,9 @@ public class GameManager : MonoBehaviour
     public Button nextBtn;
     public Button rotateBtn;
     public Button replayBtn;
-    public Text topText;
-    public Text playerShipText;
-    public Text enemyShipText;
+    public TextMeshPro topText;
+    public TextMeshPro playerShipText;
+    public TextMeshPro enemyShipText;
 
     [Header("Objects")]
     public GameObject missilePrefab;
@@ -135,14 +135,14 @@ public class GameManager : MonoBehaviour
                     enemyShipCount--;
                     topText.text = "SUNK!!!!!!";
                     enemyFires.Add(Instantiate(firePrefab, tile.transform.position, Quaternion.identity));
-                    tile.GetComponent<TileScript>().SetTileColor(1, new Color32(68, 0, 0, 255));
-                    tile.GetComponent<TileScript>().SwitchColors(1);
+                    tile.GetComponent<Tile>().SetTileColor(1, new Color32(68, 0, 0, 255));
+                    tile.GetComponent<Tile>().SwitchColors(1);
                 }
                 else
                 {
                     topText.text = "HIT!!";
-                    tile.GetComponent<TileScript>().SetTileColor(1, new Color32(255, 0, 0, 255));
-                    tile.GetComponent<TileScript>().SwitchColors(1);
+                    tile.GetComponent<Tile>().SetTileColor(1, new Color32(255, 0, 0, 255));
+                    tile.GetComponent<Tile>().SwitchColors(1);
                 }
                 break;
             }
@@ -150,8 +150,8 @@ public class GameManager : MonoBehaviour
         }
         if (hitCount == 0)
         {
-            tile.GetComponent<TileScript>().SetTileColor(1, new Color32(38, 57, 76, 255));
-            tile.GetComponent<TileScript>().SwitchColors(1);
+            tile.GetComponent<Tile>().SetTileColor(1, new Color32(38, 57, 76, 255));
+            tile.GetComponent<Tile>().SwitchColors(1);
             topText.text = "Missed, there is no ship there.";
         }
         Invoke("EndPlayerTurn", 1.0f);
@@ -197,7 +197,7 @@ public class GameManager : MonoBehaviour
 
     private void ColorAllTiles(int colorIndex)
     {
-        foreach (TileScript tileScript in allTileScripts)
+        foreach (Tile tileScript in allTileScripts)
         {
             tileScript.SwitchColors(colorIndex);
         }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 
@@ -39,8 +38,8 @@ public class EnemyScript : MonoBehaviour
             while (taken == true)
             {
                 taken = false;
-                int shipNose = UnityEngine.Random.Range(0, 99);
-                int rotateBool = UnityEngine.Random.Range(0, 2);
+                int shipNose = UnityEngine.Random.Range(0, 99); // Use UnityEngine.Random
+                int rotateBool = UnityEngine.Random.Range(0, 2); // Use UnityEngine.Random
                 int minusAmount = rotateBool == 0 ? 10 : 1;
                 for (int i = 0; i < tileNumArray.Length; i++)
                 {
@@ -70,7 +69,7 @@ public class EnemyScript : MonoBehaviour
         }
         foreach (var x in enemyShips)
         {
-            Debug.Log("x: " + x[0]);
+            UnityEngine.Debug.Log("x: " + x[0]); // Use UnityEngine.Debug
         }
         return enemyShips;
     }
@@ -85,7 +84,7 @@ public class EnemyScript : MonoBehaviour
         if (hitIndex.Count > 1)
         {
             int diff = hitIndex[1] - hitIndex[0];
-            int posNeg = Random.Range(0, 2) * 2 - 1;
+            int posNeg = UnityEngine.Random.Range(0, 2) * 2 - 1; // Use UnityEngine.Random
             int nextIndex = hitIndex[0] + diff;
             while (guessGrid[nextIndex] != 'o')
             {
@@ -101,13 +100,13 @@ public class EnemyScript : MonoBehaviour
         {
             List<int> closeTiles = new List<int>();
             closeTiles.Add(1); closeTiles.Add(-1); closeTiles.Add(10); closeTiles.Add(-10);
-            int index = Random.Range(0, closeTiles.Count);
+            int index = UnityEngine.Random.Range(0, closeTiles.Count); // Use UnityEngine.Random
             int possibleGuess = hitIndex[0] + closeTiles[index];
             bool onGrid = possibleGuess > -1 && possibleGuess < 100;
             while ((!onGrid || guessGrid[possibleGuess] != 'o') && closeTiles.Count > 0)
             {
                 closeTiles.RemoveAt(index);
-                index = Random.Range(0, closeTiles.Count);
+                index = UnityEngine.Random.Range(0, closeTiles.Count); // Use UnityEngine.Random
                 possibleGuess = hitIndex[0] + closeTiles[index];
                 onGrid = possibleGuess > -1 && possibleGuess < 100;
             }
@@ -115,12 +114,12 @@ public class EnemyScript : MonoBehaviour
         }
         else
         {
-            int nextIndex = Random.Range(0, 100);
-            while (guessGrid[nextIndex] != 'o') nextIndex = Random.Range(0, 100);
+            int nextIndex = UnityEngine.Random.Range(0, 100); // Use UnityEngine.Random
+            while (guessGrid[nextIndex] != 'o') nextIndex = UnityEngine.Random.Range(0, 100); // Use UnityEngine.Random
             nextIndex = GuessAgainCheck(nextIndex);
-            Debug.Log(" --- ");
+            UnityEngine.Debug.Log(" --- "); // Use UnityEngine.Debug
             nextIndex = GuessAgainCheck(nextIndex);
-            Debug.Log(" -########-- ");
+            UnityEngine.Debug.Log(" -########-- "); // Use UnityEngine.Debug
             guess = nextIndex;
         }
         GameObject tile = GameObject.Find("Tile (" + (guess + 1) + ")");
@@ -142,9 +141,9 @@ public class EnemyScript : MonoBehaviour
         if (!nearGuess && nextIndex - 1 > 0) nearGuess = guessGrid[nextIndex - 1] != 'o';
         if (!nearGuess && nextIndex + 10 < 100) nearGuess = guessGrid[nextIndex + 10] != 'o';
         if (!nearGuess && nextIndex - 10 > 0) nearGuess = guessGrid[nextIndex - 10] != 'o';
-        if (edgeCase || nearGuess) newGuess = Random.Range(0, 100);
-        while (guessGrid[newGuess] != 'o') newGuess = Random.Range(0, 100);
-        Debug.Log(str + " newGuess: " + newGuess + " e:" + edgeCase + " g:" + nearGuess);
+        if (edgeCase || nearGuess) newGuess = UnityEngine.Random.Range(0, 100); // Use UnityEngine.Random
+        while (guessGrid[newGuess] != 'o') newGuess = UnityEngine.Random.Range(0, 100); // Use UnityEngine.Random
+        UnityEngine.Debug.Log(str + " newGuess: " + newGuess + " e:" + edgeCase + " g:" + nearGuess); // Use UnityEngine.Debug
         return newGuess;
     }
     public void MissileHit(int hit)
