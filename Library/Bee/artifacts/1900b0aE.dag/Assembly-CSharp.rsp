@@ -360,6 +360,7 @@
 "Assets/Scripts/MissileScript.cs"
 "Assets/Scripts/Multiplayer/MultiplayerGameManager.cs"
 "Assets/Scripts/ShipScript.cs"
+"Assets/Scripts/SinglePlayerButton.cs"
 "Assets/Scripts/Tile.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01_UGUI.cs"
