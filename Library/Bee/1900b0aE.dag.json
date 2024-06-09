@@ -20062,7 +20062,11 @@
       "DisplayName": "Writing Assembly-CSharp.rsp",
       "ActionType": "WriteFile",
       "PayloadOffset": 1495402,
+<<<<<<< Updated upstream
       "PayloadLength": 35565,
+=======
+      "PayloadLength": 35828,
+>>>>>>> Stashed changes
       "PayloadDebugContentSnippet": "-target:library\r\n-out:\"Library",
       "Inputs": [],
       "Outputs": [
@@ -20074,7 +20078,11 @@
       "Annotation": "WriteText Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp.rsp2",
       "DisplayName": "Writing Assembly-CSharp.rsp2",
       "ActionType": "WriteFile",
+<<<<<<< Updated upstream
       "PayloadOffset": 1531054,
+=======
+      "PayloadOffset": 1531317,
+>>>>>>> Stashed changes
       "PayloadLength": 0,
       "PayloadDebugContentSnippet": "",
       "Inputs": [],
@@ -20323,7 +20331,18 @@
         "Library/Bee/artifacts/1900b0aE.dag/Unity.VSCode.Editor.ref.dll",
         "Library/Bee/artifacts/1900b0aE.dag/UnityEditor.UI.ref.dll",
         "Library/Bee/artifacts/1900b0aE.dag/UnityEngine.UI.ref.dll",
+<<<<<<< Updated upstream
         "Assets/Scripts/MenuHandler1.cs",
+=======
+        "Assets/Scripts/EnemyMissileScript.cs",
+        "Assets/Scripts/EnemyScript.cs",
+        "Assets/Scripts/GameManager.cs",
+        "Assets/Scripts/MenuHandler.cs",
+        "Assets/Scripts/Multiplayer/MultiplayerGameManager.cs",
+        "Assets/Scripts/Multiplayer/TileScript.cs",
+        "Assets/Scripts/ShipScript.cs",
+        "Assets/Scripts/Tile.cs",
+>>>>>>> Stashed changes
         "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01.cs",
         "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01_UGUI.cs",
         "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark02.cs",
@@ -20596,7 +20615,11 @@
       "Annotation": "WriteText Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp.dll.mvfrm.rsp",
       "DisplayName": "Writing Assembly-CSharp.dll.mvfrm.rsp",
       "ActionType": "WriteFile",
+<<<<<<< Updated upstream
       "PayloadOffset": 1531150,
+=======
+      "PayloadOffset": 1531413,
+>>>>>>> Stashed changes
       "PayloadLength": 9787,
       "PayloadDebugContentSnippet": "Library\\Bee\\artifacts\\mvdfrm\\U",
       "Inputs": [],

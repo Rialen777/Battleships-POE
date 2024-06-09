@@ -7,15 +7,27 @@ using UnityEngine.SceneManagement;
 
 public class MenuHandler : MonoBehaviour {
 
-	[SerializeField] private string whichScene;
+	//[SerializeField] private string whichScene;
 
     public void QuitGame()
     {
         Application.Quit();
     }
 
-    public void LoadScene()
+    public void SinglePlayer()
     {
-        SceneManager.LoadScene(whichScene);
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("SampleScene");
     }
+    
+    public void Multiplayer()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Multiplayer");
+    }
+
+   // public void LoadScene()
+  //  {
+   //     SceneManager.LoadScene(whichScene);
+   // }
 }
