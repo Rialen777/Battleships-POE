@@ -6,7 +6,9 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 using static System.Net.Mime.MediaTypeNames;
+
 
 public class GameManager : MonoBehaviour
 {
