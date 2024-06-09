@@ -356,6 +356,7 @@
 "Assets/Scripts/EnemyScript.cs"
 "Assets/Scripts/GameManager.cs"
 "Assets/Scripts/MenuHandler.cs"
+"Assets/Scripts/MissileScript.cs"
 "Assets/Scripts/Multiplayer/MultiplayerGameManager.cs"
 "Assets/Scripts/ShipScript.cs"
 "Assets/Scripts/Tile.cs"

@@ -46,13 +46,14 @@ public class ShipScript : MonoBehaviour
     {
         if (clickedTile == null) return;
         touchTiles.Clear();
-        transform.localEulerAngles += new Vector3(0, 0, nextZRotation);
+        transform.localEulerAngles += new Vector3(0, nextZRotation, 0); // Rotate on the y-axis
         nextZRotation *= -1;
         float temp = xOffset;
         xOffset = zOffset;
         zOffset = temp;
         SetPosition(clickedTile.transform.position);
     }
+
 
     public void SetPosition(Vector3 newVec)
     {
