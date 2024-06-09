@@ -8,8 +8,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
-
-
 public class GameManager : MonoBehaviour
 {
     [Header("Ships")]
@@ -24,9 +22,9 @@ public class GameManager : MonoBehaviour
     public Button nextBtn;
     public Button rotateBtn;
     public Button replayBtn;
-    public TextMeshPro topText;
-    public TextMeshPro playerShipText;
-    public TextMeshPro enemyShipText;
+    public TextMeshProUGUI topText;
+    public TextMeshProUGUI playerShipText;
+    public TextMeshProUGUI enemyShipText;
 
     [Header("Objects")]
     public GameObject missilePrefab;
@@ -43,29 +41,58 @@ public class GameManager : MonoBehaviour
     private int enemyShipCount = 5;
     private int playerShipCount = 5;
 
-
     // Start is called before the first frame update
     void Start()
     {
-        shipScript = ships[shipIndex].GetComponent<ShipScript>();
+        if (ships.Length == 0)
+        {
+            UnityEngine.Debug.LogError("No ships assigned in the inspector!");
+            return;
+        }
+
+        shipScript = ships[shipIndex]?.GetComponent<ShipScript>();
+        if (shipScript == null)
+        {
+            UnityEngine.Debug.LogError($"Ship at index {shipIndex} does not have a ShipScript component!");
+            return;
+        }
+
         nextBtn.onClick.AddListener(() => NextShipClicked());
         rotateBtn.onClick.AddListener(() => RotateClicked());
-        //replayBtn.onClick.AddListener(() => ReplayClicked());
+        replayBtn.onClick.AddListener(() => ReplayClicked());
         enemyShips = enemyScript.PlaceEnemyShips();
     }
 
     private void NextShipClicked()
     {
+        if (shipScript == null)
+        {
+            UnityEngine.Debug.LogError("shipScript is null!");
+            return;
+        }
+
         if (!shipScript.OnGameBoard())
         {
             shipScript.FlashColor(Color.red);
         }
         else
         {
-            if (shipIndex <= ships.Length - 2)
+            if (shipIndex < ships.Length - 1)
             {
                 shipIndex++;
+                if (ships[shipIndex] == null)
+                {
+                    UnityEngine.Debug.LogError($"Ship at index {shipIndex} is null!");
+                    return;
+                }
+
                 shipScript = ships[shipIndex].GetComponent<ShipScript>();
+                if (shipScript == null)
+                {
+                    UnityEngine.Debug.LogError($"Ship at index {shipIndex} does not have a ShipScript component!");
+                    return;
+                }
+
                 shipScript.FlashColor(Color.yellow);
             }
             else
@@ -78,7 +105,6 @@ public class GameManager : MonoBehaviour
                 for (int i = 0; i < ships.Length; i++) ships[i].SetActive(false);
             }
         }
-
     }
 
     public void TileClicked(GameObject tile)
@@ -99,7 +125,13 @@ public class GameManager : MonoBehaviour
 
     private void PlaceShip(GameObject tile)
     {
-        shipScript = ships[shipIndex].GetComponent<ShipScript>();
+        shipScript = ships[shipIndex]?.GetComponent<ShipScript>();
+        if (shipScript == null)
+        {
+            UnityEngine.Debug.LogError($"Ship at index {shipIndex} does not have a ShipScript component!");
+            return;
+        }
+
         shipScript.ClearTileList();
         Vector3 newVec = shipScript.GetOffsetVec(tile.transform.position);
         ships[shipIndex].transform.localPosition = newVec;
@@ -146,7 +178,6 @@ public class GameManager : MonoBehaviour
                 }
                 break;
             }
-
         }
         if (hitCount == 0)
         {
@@ -180,7 +211,7 @@ public class GameManager : MonoBehaviour
         topText.text = "Enemy's turn";
         enemyScript.NPCTurn();
         ColorAllTiles(0);
-        if (playerShipCount < 1) GameOver("ENEMY WINs!!!");
+        if (playerShipCount < 1) GameOver("ENEMY WINS!!!");
     }
 
     public void EndEnemyTurn()
@@ -214,6 +245,4 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-
-
 }
