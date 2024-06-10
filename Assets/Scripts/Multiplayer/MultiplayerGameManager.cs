@@ -6,90 +6,136 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 
 public class MultiplayerGameManager : MonoBehaviour
 {
     [Header("Ships")]
     public GameObject[] ships;
-    public EnemyScript enemyScript;
+    // Removed: public EnemyScript enemyScript;
     private ShipScript shipScript;
-
-    //public Tile tileScript;
-    private List<int[]> enemyShips;
+    // Removed: private List<int[]> enemyShips;
     private int shipIndex = 0;
-    public List<Tile> allTileScripts;    
+    public List<TileScript> allTileScripts;    
 
     [Header("HUD")]
     public Button nextBtn;
     public Button rotateBtn;
     public Button replayBtn;
-    public TextMeshPro topText;
-    public TextMeshPro playerShipText;
-    public TextMeshPro enemyShipText;
+    public TextMeshProUGUI topText;
+    public TextMeshProUGUI playerShipText;
+    public TextMeshProUGUI enemyShipText;
 
     [Header("Objects")]
     public GameObject missilePrefab;
-    public GameObject enemyMissilePrefab;
+    // Removed: public GameObject enemyMissilePrefab;
     public GameObject firePrefab;
     public GameObject woodDock;
 
     private bool setupComplete = false;
-    private bool playerTurn = true;
-    private bool player1Turn = true; // Track whose turn it is (Player 1 or Player 2)
+    private bool playerTurn = true; // Player 1 starts
+    private bool player1SetupComplete = false;
+    private bool player2SetupComplete = false;
 
     private List<GameObject> playerFires = new List<GameObject>();
-    private List<GameObject> enemyFires = new List<GameObject>();
+    // Removed: private List<GameObject> enemyFires = new List<GameObject>();
 
-    private int enemyShipCount = 5;
+    // Removed: private int enemyShipCount = 5;
     private int playerShipCount = 5;
 
     // Start is called before the first frame update
     void Start()
     {
-        shipScript = ships[shipIndex].GetComponent<ShipScript>();
+        if (ships.Length == 0)
+        {
+            UnityEngine.Debug.LogError("No ships assigned in the inspector!");
+            return;
+        }
+
+        shipScript = ships[shipIndex]?.GetComponent<ShipScript>();
+        if (shipScript == null)
+        {
+            UnityEngine.Debug.LogError($"Ship at index {shipIndex} does not have a ShipScript component!");
+            return;
+        }
+
         nextBtn.onClick.AddListener(() => NextShipClicked());
         rotateBtn.onClick.AddListener(() => RotateClicked());
         replayBtn.onClick.AddListener(() => ReplayClicked());
-        // Initialize enemy ships for Player 2
-        enemyShips = enemyScript.PlaceEnemyShips();
+        // Removed: enemyShips = enemyScript.PlaceEnemyShips();
     }
 
     private void NextShipClicked()
     {
+        Debug.Log("OnGameBoard() returned: " + shipScript.OnGameBoard()); 
+        if (shipScript == null)
+        {
+            UnityEngine.Debug.LogError("shipScript is null!");
+            return;
+        }
+
         if (!shipScript.OnGameBoard())
         {
             shipScript.FlashColor(Color.red);
-        } else
+        }
+        else
         {
-            if(shipIndex <= ships.Length - 2)
+            if (shipIndex < ships.Length - 1)
             {
                 shipIndex++;
+                if (ships[shipIndex] == null)
+                {
+                    UnityEngine.Debug.LogError($"Ship at index {shipIndex} is null!");
+                    return;
+                }
+
                 shipScript = ships[shipIndex].GetComponent<ShipScript>();
+                if (shipScript == null)
+                {
+                    UnityEngine.Debug.LogError($"Ship at index {shipIndex} does not have a ShipScript component!");
+                    return;
+                }
+
                 shipScript.FlashColor(Color.yellow);
             }
             else
             {
-                rotateBtn.gameObject.SetActive(false);
-                nextBtn.gameObject.SetActive(false);
-                woodDock.SetActive(false);
-                topText.text = "Player 1's turn. Guess an enemy tile.";
-                setupComplete = true;
-                for (int i = 0; i < ships.Length; i++) ships[i].SetActive(false);
+                if (playerTurn) 
+                {
+                    nextBtn.gameObject.SetActive(true);
+                    rotateBtn.gameObject.SetActive(true);
+                    woodDock.SetActive(true);
+                    player1SetupComplete = true;
+                    topText.text = "Player 2, place your ships.";
+                    shipIndex = 0; // Reset ship index for Player 2
+                    shipScript = ships[shipIndex].GetComponent<ShipScript>();
+                    
+                }
+                else 
+                {
+                    nextBtn.gameObject.SetActive(false);
+                    rotateBtn.gameObject.SetActive(false);
+                    woodDock.gameObject.SetActive(false);
+                    player2SetupComplete = true;
+                    topText.text = "Player 1, start guessing.";
+                    setupComplete = true;
+                    for (int i = 0; i < ships.Length; i++) ships[i].SetActive(false);
+                    
+                }
             }
         }
-
     }
 
     public void TileClicked(GameObject tile)
     {
-        if(setupComplete && playerTurn)
+        if (setupComplete && playerTurn)
         {
             Vector3 tilePos = tile.transform.position;
             tilePos.y += 15;
             playerTurn = false;
-            // Use the correct missile prefab based on whose turn it is
-            Instantiate((player1Turn) ? missilePrefab : enemyMissilePrefab, tilePos, missilePrefab.transform.rotation);
-        } else if (!setupComplete)
+            Instantiate(missilePrefab, tilePos, missilePrefab.transform.rotation);
+        }
+        else if (!setupComplete)
         {
             PlaceShip(tile);
             shipScript.SetClickedTile(tile);
@@ -98,7 +144,13 @@ public class MultiplayerGameManager : MonoBehaviour
 
     private void PlaceShip(GameObject tile)
     {
-        shipScript = ships[shipIndex].GetComponent<ShipScript>();
+        shipScript = ships[shipIndex]?.GetComponent<ShipScript>();
+        if (shipScript == null)
+        {
+            UnityEngine.Debug.LogError($"Ship at index {shipIndex} does not have a ShipScript component!");
+            return;
+        }
+
         shipScript.ClearTileList();
         Vector3 newVec = shipScript.GetOffsetVec(tile.transform.position);
         ships[shipIndex].transform.localPosition = newVec;
@@ -113,108 +165,83 @@ public class MultiplayerGameManager : MonoBehaviour
     {
         int tileNum = Int32.Parse(Regex.Match(tile.name, @"\d+").Value);
         int hitCount = 0;
-        foreach (int[] tileNumArray in enemyShips)
+        TileScript tileScript = tile.GetComponent<TileScript>();
+        foreach (TileScript targettileScript in allTileScripts)
         {
-            if (Array.Exists(tileNumArray, element => element == tileNum))
+            if (tileScript.tileNumArrays.Contains(tileNum))
             {
-                for (int i = 0; i < tileNumArray.Length; i++)
+                for (int i = 0; i < tileScript.tileNumArrays.Length; i++)
                 {
-                    if (tileNumArray[i] == tileNum)
+                    if (tileScript.tileNumArrays[i] == tileNum)
                     {
-                        tileNumArray[i] = -5;
+                        tileScript.tileNumArrays[i] = -5;
                         hitCount++;
                     }
-                    else if (tileNumArray[i] == -5)
+                    else if (tileScript.tileNumArrays[i] == -5)
                     {
                         hitCount++;
                     }
                 }
-                if (hitCount == tileNumArray.Length)
+                if (hitCount == tileScript.tileNumArrays.Length)
                 {
-                    enemyShipCount--;
-                    topText.text = "SUNK!!!!!!";
-                    enemyFires.Add(Instantiate(firePrefab, tile.transform.position, Quaternion.identity));
-                    tile.GetComponent<Tile>().SetTileColor(1, new Color32(68, 0, 0, 255));
-                    tile.GetComponent<Tile>().SwitchColors(1);
+                    playerShipCount--; // Assuming the player being attacked is always losing a ship
+                    if (playerTurn) 
+                    {
+                        enemyShipText.text = playerShipCount.ToString();
+                        topText.text = "Player 2 sunk a ship!  Player 1, take another turn.";
+                        playerTurn = true;
+                    }
+                    else 
+                    {
+                        playerShipText.text = playerShipCount.ToString();
+                        topText.text = "Player 1 sunk a ship!  Player 2, take another turn.";
+                        playerTurn = false;
+                    }
+                    playerFires.Add(Instantiate(firePrefab, tile.transform.position, Quaternion.identity));
+                    tileScript.SetTileColor(1, new Color32(68, 0, 0, 255));
+                    tileScript.SwitchColors(1);
                 }
                 else
                 {
-                    topText.text = "HIT!!";
-                    tile.GetComponent<Tile>().SetTileColor(1, new Color32(255, 0, 0, 255));
-                    tile.GetComponent<Tile>().SwitchColors(1);
+                    if (playerTurn) 
+                    {
+                        enemyShipText.text = playerShipCount.ToString();
+                        topText.text = "Player 2 hit! Player 1, your turn.";
+                    }
+                    else
+                    {
+                        playerShipText.text = playerShipCount.ToString();
+                        topText.text = "Player 1 hit! Player 2, your turn.";
+                    }
+                    tileScript.SetTileColor(1, new Color32(255, 0, 0, 255));
+                    tileScript.SwitchColors(1);
                 }
                 break;
             }
+
         }
-        if (hitCount == 0)
+        if(hitCount == 0)
         {
-            tile.GetComponent<Tile>().SetTileColor(1, new Color32(38, 57, 76, 255));
-            tile.GetComponent<Tile>().SwitchColors(1);
-            topText.text = "Missed, there is no ship there.";
+            if (playerTurn) 
+            {
+                enemyShipText.text = playerShipCount.ToString();
+                topText.text = "Player 2 missed! Player 1, your turn.";
+            }
+            else 
+            {
+                playerShipText.text = playerShipCount.ToString();
+                topText.text = "Player 1 missed! Player 2, your turn.";
+            }
+            tileScript.SetTileColor(1, new Color32(38, 57, 76, 255));
+            tileScript.SwitchColors(1);
         }
-        Invoke("EndPlayerTurn", 1.0f);
+        // Invoke("EndPlayerTurn", 1.0f); // Removed - No need for separate turn ending functions
     }
 
-
-    public void EnemyHitPlayer(Vector3 tile, int tileNum, GameObject hitObj)
-    {
-        enemyScript.MissileHit(tileNum);
-        tile.y += 0.2f;
-        playerFires.Add(Instantiate(firePrefab, tile, Quaternion.identity));
-        if (hitObj.GetComponent<ShipScript>().HitCheckSank())
-        {
-            playerShipCount--;
-            playerShipText.text = playerShipCount.ToString();
-            enemyScript.SunkPlayer();
-        }
-       Invoke("EndEnemyTurn", 2.0f);
-    }
-
-    private void EndPlayerTurn()
-    {
-        for (int i = 0; i < ships.Length; i++) ships[i].SetActive(true);
-        foreach (GameObject fire in playerFires) fire.SetActive(true);
-        foreach (GameObject fire in enemyFires) fire.SetActive(false);
-        enemyShipText.text = enemyShipCount.ToString();
-
-        // Switch to the other player's turn
-        player1Turn = !player1Turn;
-
-        if (player1Turn)
-        {
-            topText.text = "Player 1's turn. Select a tile.";
-        }
-        else
-        {
-            topText.text = "Player 2's turn. Select a tile.";
-        }
-        
-        playerTurn = true;
-        ColorAllTiles(1);
-        if (enemyShipCount < 1) GameOver("Player 1 WINS!!");
-        if (playerShipCount < 1) GameOver("Player 2 WINS!!!");
-    }
-
-    public void EndEnemyTurn()
-    {
-        for (int i = 0; i < ships.Length; i++) ships[i].SetActive(false);
-        foreach (GameObject fire in playerFires) fire.SetActive(false);
-        foreach (GameObject fire in enemyFires) fire.SetActive(true);
-        playerShipText.text = playerShipCount.ToString();
-        topText.text = "Player 2's turn. Select a tile.";
-        playerTurn = true;
-        ColorAllTiles(1);
-        if (enemyShipCount < 1) GameOver("Player 1 WINS!!");
-        if (playerShipCount < 1) GameOver("Player 2 WINS!!!");
-    }
-
-    private void ColorAllTiles(int colorIndex)
-    {
-        foreach (Tile tileScript in allTileScripts)
-        {
-            tileScript.SwitchColors(colorIndex);
-        }
-    }
+    // Removed: public void EnemyHitPlayer(Vector3 tile, int tileNum, GameObject hitObj)
+    // Removed: private void EndPlayerTurn()
+    // Removed: public void EndEnemyTurn()
+    // Removed: private void ColorAllTiles(int colorIndex)
 
     void GameOver(string winner)
     {
@@ -230,3 +257,5 @@ public class MultiplayerGameManager : MonoBehaviour
 
 
 }
+
+// Tile script

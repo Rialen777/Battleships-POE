@@ -68,6 +68,8 @@ public class ShipScript : MonoBehaviour
 
     public bool OnGameBoard()
     {
+        Debug.Log("touchTiles Count: " + touchTiles.Count);
+        Debug.Log("Ship Size: " + shipSize);
         return touchTiles.Count == shipSize;
     }
 
